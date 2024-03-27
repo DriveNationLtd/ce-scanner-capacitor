@@ -10,10 +10,17 @@ interface Html5QRScannerProps {
     onScanSuccess: (decodedText: string) => void;
     handleError?: (errorMessage: string, error: Html5QrcodeError) => void;
     startScanning?: boolean;
+    allowFileScan?: boolean;
 }
 
 const qrcodeRegionId = "reader";
-let defaultConfig: Html5QrcodeScannerConfig = { qrbox: { width: 250, height: 250 }, fps: 40, aspectRatio: .7 }
+let defaultConfig: Html5QrcodeScannerConfig = {
+    qrbox: { width: 250, height: 250 },
+    fps: 60,
+    showTorchButtonIfSupported: true,
+    showZoomSliderIfSupported: true,
+    aspectRatio: 1.7777778
+}
 let html5QrCode: Html5Qrcode | undefined;
 
 // Creates the configuration object for Html5QrcodeScanner.
@@ -46,7 +53,8 @@ const createConfig = (props?: Html5QrcodeScannerConfig): Html5QrcodeScannerConfi
 export const Html5QRScanner: React.FC<Html5QRScannerProps> = ({
     onScanSuccess,
     handleError,
-    startScanning = false
+    startScanning = false,
+    allowFileScan = false
 }) => {
     const fileRef = useRef<HTMLInputElement>(null);
 
@@ -183,29 +191,36 @@ export const Html5QRScanner: React.FC<Html5QRScannerProps> = ({
     };
 
     return (
-        <div className="container max-w-md">
-            <div id={qrcodeRegionId}></div>
+        <div className="container w-full h-full">
+            <div id={qrcodeRegionId} style={{
+                width: "100%",
+                // height: "100%",
+            }}></div>
 
             <div className="flex flex-col justify-center">
                 {!isScanning && !startScanning ? (
                     <ThemeBtn onClick={handleClickAdvanced}>Start Scanning</ThemeBtn>
                 ) :
-                    <div className='flex justify-between px-3 py-4'>
-                        <ThemeBtn onClick={handleStop}>
+                    <div className='flex justify-between px-3 py-4 w-full'>
+                        {/* <ThemeBtn onClick={handleStop}>
                             Stop Scanning
-                        </ThemeBtn>
-                        <ThemeBtn onClick={scanLocalFile}>
-                            Scan File
-                        </ThemeBtn>
+                        </ThemeBtn> */}
+                        {allowFileScan && (
+                            <ThemeBtn onClick={scanLocalFile}>
+                                Scan File
+                            </ThemeBtn>
+                        )}
                     </div>
                 }
-                <input
-                    type="file"
-                    accept="image/*"
-                    ref={fileRef}
-                    onChange={scanFile}
-                    style={{ display: "none" }}
-                />
+                {allowFileScan && (
+                    <input
+                        type="file"
+                        accept="image/*"
+                        ref={fileRef}
+                        onChange={scanFile}
+                        style={{ display: "none" }}
+                    />
+                )}
             </div>
         </div>
     );
