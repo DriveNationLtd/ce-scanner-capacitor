@@ -27,11 +27,11 @@ const SlideInFromBottomToTop: React.FC<SlideInFromBottomToTopProps> = ({
     return (
         <Transition
             show={isOpen}
-            className="z-10 w-full fixed bottom-0 inset-x-0 bg-white h-full px-5"
+            className="z-10 w-full fixed bottom-0 inset-x-0 bg-white h-full"
             style={{ height }}
             {...transitionClasses}
         >
-            <div className="flex justify-start w-full mt-5 overflow-scroll">
+            <div className="flex justify-start w-full mt-5 overflow-scroll px-5">
                 <button
                     onClick={() => onClose()}
                     className="text-md text-black mb-3 cursor-pointer font-bold"
@@ -39,7 +39,7 @@ const SlideInFromBottomToTop: React.FC<SlideInFromBottomToTopProps> = ({
                     &#x2715;
                 </button>
             </div>
-            <div className="flex flex-col items-center w-full mt-3">
+            <div className="flex flex-col items-center w-full mt-3 h-full">
                 {children}
             </div>
         </Transition>

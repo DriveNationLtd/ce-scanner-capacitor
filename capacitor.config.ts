@@ -9,6 +9,8 @@ const config: CapacitorConfig = {
   bundledWebRuntime: false,
   loggingBehavior: 'debug',
   server: {
+    // url: "http://192.168.210.187:5173",
+    // cleartext: true,
     androidScheme: "http"
   },
   plugins: {
@@ -26,10 +28,6 @@ const config: CapacitorConfig = {
         biometricTitle: "Biometric login for capacitor sqlite",
         biometricSubTitle: "Log in using your biometric"
       },
-      // electronIsEncryption: false,
-      // electronWindowsLocation: "C:\\ProgramData\\CapacitorDatabases",
-      // electronMacLocation: "/Users/YOUR_NAME/CapacitorDatabases",
-      // electronLinuxLocation: "Databases"
     }
   }
 };
