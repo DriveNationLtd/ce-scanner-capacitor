@@ -63,13 +63,21 @@ export const ScanResult: React.FC<ScanResultProps> = ({
 
         if (ticket.error && !success) {
             return (
-                <ErrorMessage message={ticket.error} />
+                <div className="flex flex-col h-full items-center justify-center px-3">
+                    <ErrorMessage message={ticket.error} />
+                    <ThemeBtn
+                        className="bg-white border border-theme-primary hover:bg-theme-primary hover:text-white w-full text-center text-theme-primary text-lg font-medium"
+                        onClick={() => callback(null)}
+                    >
+                        Try Again
+                    </ThemeBtn>
+                </div>
             );
         }
 
         if (!data || !data.ticket) {
             return (
-                <div className="flex flex-col h-full items-center justify-center">
+                <div className="flex flex-col h-full items-center justify-center px-3">
                     <ErrorMessage message={"Oops! No ticket data found"} />
                     <ThemeBtn
                         className="bg-white border border-theme-primary hover:bg-theme-primary hover:text-white w-full text-center text-theme-primary text-lg font-medium"
