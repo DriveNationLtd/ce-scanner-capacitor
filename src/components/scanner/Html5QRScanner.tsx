@@ -192,10 +192,15 @@ export const Html5QRScanner: React.FC<Html5QRScannerProps> = ({
 
     return (
         <div className="container w-full h-full">
-            <div id={qrcodeRegionId} style={{
-                width: "100%",
-                // height: "100%",
-            }}></div>
+            <div id={qrcodeRegionId} className="w-full text-black flex items-center justify-start bg-gray-200">
+                <div className="p-4 bg-white rounded-lg shadow-lg">
+                    <svg className="animate-spin h-12 w-12 text-gray-600 mx-auto" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.373A8 8 0 0112 4V0C6.486 0 2 4.486 2 10h4zm6 6.627A8 8 0 0014 20v4c5.627 0 10-4.473 10-10h-4zm-6 5.373A8 8 0 004 12h-4c0 5.627 4.473 10 10 10v-4z"></path>
+                    </svg>
+                    <div className="mt-4 text-center">Initializing Scanner...</div>
+                </div>
+            </div>
 
             <div className="flex flex-col justify-center">
                 {!isScanning && !startScanning ? (

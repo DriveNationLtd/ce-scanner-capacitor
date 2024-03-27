@@ -8,12 +8,14 @@ import { BrowserRouter } from 'react-router-dom'
 import { BrowserRouter as Router, Route, createBrowserRouter, createRoutesFromElements, RouterProvider } from "react-router-dom";
 import { SingleEvent } from './components/events/SingleEvent'
 import Layout from './Layout'
+import Login from './components/Login'
 
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
+    errorElement: <>Error</>,
     children: [
       {
         path: "/",
@@ -37,6 +39,10 @@ const router = createBrowserRouter([
       }
     ],
   },
+  {
+    path: "/login",
+    element: <Login />,
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

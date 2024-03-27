@@ -10,8 +10,9 @@ const Layout: React.FC<LayoutProps> = ({ }) => {
         <>
             <div className="container">
                 <Header />
+                <div className="h-16"></div>
                 <Outlet />
-                <div className="h-20"></div>
+                <div className="h-24"></div>
                 <Footer />
             </div>
         </>

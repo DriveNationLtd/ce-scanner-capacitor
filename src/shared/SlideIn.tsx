@@ -27,8 +27,8 @@ const SlideInFromBottomToTop: React.FC<SlideInFromBottomToTopProps> = ({
     return (
         <Transition
             show={isOpen}
-            className="z-10 w-full fixed bottom-0 inset-x-0 bg-white h-full"
-            style={{ height }}
+            className="w-full fixed bottom-0 inset-x-0 bg-white h-full z-50"
+            style={{ height, zIndex: 9999 }}
             {...transitionClasses}
         >
             <div className="flex justify-start w-full mt-5 overflow-scroll px-5">

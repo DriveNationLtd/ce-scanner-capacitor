@@ -7,7 +7,7 @@ import { TicketScanResponse } from '../../types/event';
 import { formatDate } from '../../utils/date';
 import { capitalize, formatCarDetails } from '../../utils/string';
 import clsx from 'clsx';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 interface ScanResultProps {
     result: TicketScanResponse | null;
@@ -211,11 +211,23 @@ export const ScanResult: React.FC<ScanResultProps> = ({
                         (
                             <ThemeBtn
                                 className='bg-white border border-green-600 hover:bg-green-600 hover:text-white w-full text-center text-green-600 uppercase text-lg font-medium'
-                                onClick={() => handleRedeem(order_item_id)}
+                                onClick={() => {
+                                    if (redeeming.success) {
+                                        setRedeeming({
+                                            loading: false,
+                                            success: false,
+                                            message: "",
+                                        });
+
+                                        return callback(null);
+                                    }
+
+                                    handleRedeem(order_item_id)
+                                }}
                                 disabled={redeeming.loading}
                                 loading={redeeming.loading}
                             >
-                                {redeeming.success ? "Redeemed" : "Redeem"}
+                                {redeeming.success ? "Scan Again" : "Redeem"}
                             </ThemeBtn>
                         )
                     }

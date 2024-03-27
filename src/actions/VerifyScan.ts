@@ -38,7 +38,6 @@ export const getEvents = async (): Promise<EventsResponse> => {
         });
 
         const data = JSON.parse(await response.json());
-        // syncEvents(data?.events);
         return data;
     } catch (error: any) {
         return {

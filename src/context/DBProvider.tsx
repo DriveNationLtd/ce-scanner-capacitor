@@ -73,7 +73,7 @@ export const DBProvider = ({ children }: { children: React.ReactNode }) => {
                 db.close(); // Close the connection when the component unmounts
             }
         };
-    }, []);
+    }, [db]);
 
     return (
         <DBContext.Provider value={{ db }}>
