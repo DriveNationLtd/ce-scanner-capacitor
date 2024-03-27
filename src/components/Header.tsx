@@ -1,26 +1,20 @@
 'use client'
 
-// import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from 'react';
 
 // import { SignOutBtn } from "@/shared/SignOutBtn";
 // import { ConnectivityStatus } from "@/shared/ConnectivityStatus";
-import { Link } from "./Link";
+import { ConnectivityStatus } from './Connectivity';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 
 const navLinks = [
     { href: '/', label: 'Home' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/about', label: 'About' },
-    // { href: '/events', label: 'Events' },
 ];
 
-const back = () => {
-    window.history.back();
-}
-
 export const Header: React.FC = () => {
-    // const { back } = useRouter();
-    const pathname = '/'; // usePathname();
+    const location = useLocation();
 
     const [menuMode, setMenuMode] = useState<number>(1);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -33,22 +27,22 @@ export const Header: React.FC = () => {
         setIsMenuOpen(false);
     };
 
-    // useEffect(() => {
-    //     // if path is events/:id, close the menu
-    //     if (pathname.includes('/events/')) {
-    //         setMenuMode(2);
-    //     } else {
-    //         setMenuMode(1);
-    //     }
-    // }, [pathname]);
+    useEffect(() => {
+        // if path is events/:id, close the menu
+        if (location.pathname.includes('/events/')) {
+            setMenuMode(2);
+        } else {
+            setMenuMode(1);
+        }
+    }, [location.pathname]);
 
     return (
         <div className="bg-theme-dark h-16 w-full flex justify-between items-center px-4 z-50">
             <div className="text-white text-xl">
                 {menuMode === 2 && (
-                    <button onClick={back} className="text-white">
+                    <Link to={"/"} className="text-white">
                         <i className="fas fa-chevron-left"></i>
-                    </button>
+                    </Link>
                 )}
 
                 {menuMode === 1 && (
@@ -64,15 +58,16 @@ export const Header: React.FC = () => {
                 )}
 
             </div>
-            <Link href="/">
+            <Link to="/">
                 <img src="/logo.png" alt="CarEvents.com" width={100} height={100} className="max-w-16" />
             </Link>
+            <ConnectivityStatus />
             <div className={`absolute top-16 left-0 bg-theme-dark w-full h-[calc(100vh-4rem)] p-4 z-10 transition-all duration-300 ${isMenuOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-[100%] pointer-events-none'}`}>
                 <ul className="flex flex-col h-full justify-between">
                     <div className="top-nav flex flex-col gap-4">
                         {navLinks.map((link, index) => (
                             <li key={index} onClick={closeMenu}>
-                                <Link href={link.href} className={`${pathname === link.href ? 'text-white/60' : 'text-white '}`}>
+                                <Link to={link.href} className={`${location.pathname === link.href ? 'text-white/60' : 'text-white '}`}>
                                     {link.label}
                                 </Link>
                             </li>
@@ -82,7 +77,7 @@ export const Header: React.FC = () => {
 
                     <div className="bottom-nav">
                         <li onClick={closeMenu}>
-                            <Link href="/help" className="text-white">Help</Link>
+                            <Link to="/help" className="text-white">Help</Link>
                         </li>
                     </div>
                 </ul>

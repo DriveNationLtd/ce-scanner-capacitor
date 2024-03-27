@@ -3,7 +3,7 @@
 import { EventTicketProgressResponse, EventsResponse, SingleEventResponse, TicketRedeemResponse, TicketScanResponse } from "../types/event";
 // import { syncEvents } from "./syncAction";
 // process.env.HEADLESS_CMS_API_URL ??
-const API_URL =  "https://www.carevents.com";
+const API_URL = "https://www.carevents.com";
 
 const getSessionUser = async () => {
     // const session = await auth();
@@ -24,16 +24,6 @@ export const getEvents = async (): Promise<EventsResponse> => {
 
     try {
         const user = await getSessionUser();
-
-        // try to get events from local database
-        // const events = await getAllEvents();
-        // if (events.length > 0) {
-        //     return {
-        //         success: true,
-        //         isLocal: true,
-        //         events,
-        //     }
-        // }
 
         let response = await fetch(url, {
             cache: "force-cache",

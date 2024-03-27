@@ -23,9 +23,9 @@ export const EventTile: React.FC<EventTileProps> = ({ event }) => {
                         <h2 className="font-bold mb-2 text-md text-white">{title}</h2>
                         <p className="text-gray-300 text-xs">{formattedDate}</p>
                         {(orders && !orders.error) && (
-                        <div className="order-items-status text-xs mt-2 text-white">
-                            Scanned: <span className='text-green-500'>{orders.scanned}</span>/<span>{orders.total}</span>
-                        </div>
+                            <div className="order-items-status text-xs mt-2 text-white">
+                                Scanned: <span className='text-green-500'>{orders.scanned}</span>/<span>{orders.total}</span>
+                            </div>
                         )}
 
                         {(orders && orders.error) && (
@@ -39,6 +39,27 @@ export const EventTile: React.FC<EventTileProps> = ({ event }) => {
                 <i className="fas fa-chevron-right text-sm text-gray-300"></i>
             </div>
         </Link>
+    );
+}
+
+export const EventTileSkeleton: React.FC = () => {
+    return (
+        <>
+            {[1, 2, 3, 4].map((_, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-4 w-full rounded-md mb-2 bg-theme-dark border-none bg-opacity-90 animate-pulse">
+                    <div className="w-1/4 mr-4">
+                        <div className="w-full h-0 min-w-[100px] max-w-[100px] lg:max-w-none bg-gray-300 rounded-lg" style={{ paddingBottom: '100%' }}></div>
+                    </div>
+                    <div className="flex flex-col justify-between flex-grow mt-2">
+                        <div className='flex items-start justify-start flex-col'>
+                            <div className="w-1/2 h-4 bg-gray-300 mb-2 rounded-lg"></div>
+                            <div className="w-1/4 h-3 bg-gray-300 rounded-lg"></div>
+                        </div>
+                    </div>
+                    <i className="fas fa-chevron-right text-sm text-gray-300"></i>
+                </div>
+            ))}
+        </>
     );
 }
 

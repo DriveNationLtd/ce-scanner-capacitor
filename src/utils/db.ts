@@ -2,11 +2,17 @@
 // https://www.youtube.com/watch?v=U65a0T3W6uY
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { EVENT_TABLE } from '../context/DBProvider';
-import { Event } from '../types/event';
+import { Event, EventsResponse } from '../types/event';
+import { getEvents } from '../actions/VerifyScan';
 
-export const syncEvents = async (db: SQLiteDBConnection) => {
+export const syncEvents = async (db: SQLiteDBConnection, data: EventsResponse) => {
     try {
-        return null
+        // Loop through the events and insert them into the database
+        if (data && data.events) {
+            data.events.forEach(async (event: Event) => {
+                insertEvent(event, db);
+            })
+        }
     } catch (err) {
         console.log(`$$$ in syncEvents error ${err} $$$`);
         return null;
@@ -42,14 +48,20 @@ export const insertEvent = async (event: Event, db: SQLiteDBConnection) => {
 
 // Function to get all events from the database
 export const getAllEvents = async (db: SQLiteDBConnection): Promise<Event[] | []> => {
-    // select all from cc_events
     const query = `SELECT * FROM ${EVENT_TABLE};`;
 
     try {
         const result = await db?.query(query);
+        if (!result.values) {
+            const data = await getEvents();
+            if (data.success) {
+                await syncEvents(db, data);
+                return data.events ?? [];
+            }
+        }
         return result.values ?? [];
     } catch (error) {
-        console.error(`$$$ Error getting all events: `, error); // `Error getting all events: ${error.message}
+        console.error(`$$$ Error getting all events: `, error);
         return [];
     }
 };

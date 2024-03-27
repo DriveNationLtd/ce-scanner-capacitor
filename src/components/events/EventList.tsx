@@ -3,7 +3,7 @@ import { useDB } from '../../context/DBProvider';
 import { getAllEvents } from '../../utils/db';
 import { Event, EventsResponse } from '../../types/event';
 import Loader from "../../shared/Loader";
-import { EventTile, NoEventsPlaceholder } from "./EventTile";
+import { EventTile, EventTileSkeleton, NoEventsPlaceholder } from "./EventTile";
 import { Suspense } from "react";
 
 export const EventsAysnc: React.FC = () => {
@@ -53,12 +53,14 @@ export const EventsAysnc: React.FC = () => {
 export const EventList: React.FC = () => {
     const { db } = useDB();
     const [events, setEvents] = useState<Event[] | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (db) {
             getAllEvents(db).then((events) => {
                 console.log("$$$ Events: ", JSON.stringify(events));
                 setEvents(events);
+                setLoading(false);
             });
         }
     }, [db]);
@@ -69,6 +71,8 @@ export const EventList: React.FC = () => {
                 <h1 className="text-3xl font-semibold mb-4 text-center">
                     Your Events
                 </h1>
+                {loading && <EventTileSkeleton />}
+                {events && events.length === 0 && <NoEventsPlaceholder />}
                 {events?.map((event) => (
                     <EventTile key={event.id} event={event} />
                 ))}
