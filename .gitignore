@@ -27,4 +27,6 @@ dist-ssr
 android
 ios
 
+
+*.wasm
 .env

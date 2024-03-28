@@ -1,7 +1,6 @@
 // import { auth } from "@/auth";
 // import { getAllEvents } from "@/localdb/db-helpers";
 import { EventTicketProgressResponse, EventsResponse, SingleEventResponse, TicketRedeemResponse, TicketScanResponse } from "../types/event";
-// import { syncEvents } from "./syncAction";
 // process.env.HEADLESS_CMS_API_URL ??
 const API_URL = "https://www.carevents.com";
 
@@ -34,6 +33,7 @@ export const getEvents = async (): Promise<EventsResponse> => {
             body: JSON.stringify({
                 // @ts-ignore
                 user_id: user?.id,
+                // include_query: true
             }),
         });
 

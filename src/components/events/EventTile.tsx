@@ -7,7 +7,7 @@ interface EventTileProps {
 }
 
 export const EventTile: React.FC<EventTileProps> = ({ event }) => {
-    const { title, start_date, image, orders } = event;
+    const { title, start_date, image, total_orders, scanned_orders, orders_error } = event;
     const formattedDate = formatDate(start_date);
 
     return (
@@ -22,14 +22,14 @@ export const EventTile: React.FC<EventTileProps> = ({ event }) => {
                     <div className='flex items-start justify-start flex-col'>
                         <h2 className="font-bold mb-2 text-md text-white">{title}</h2>
                         <p className="text-gray-300 text-xs">{formattedDate}</p>
-                        {(orders && !orders.error) && (
+                        {(!orders_error) && (
                             <div className="order-items-status text-xs mt-2 text-white">
-                                Scanned: <span className='text-green-500'>{orders.scanned}</span>/<span>{orders.total}</span>
+                                Scanned: <span className='text-green-500'>{scanned_orders}</span>/<span>{total_orders}</span>
                             </div>
                         )}
 
-                        {(orders && orders.error) && (
-                            <p className="text-red-500 text-xs mt-2">{orders.error}</p>
+                        {(orders_error) && (
+                            <p className="text-red-500 text-xs mt-2">{orders_error}</p>
                         )}
                     </div>
                     <div className="absolute inset-0 -z-10 bg-black opacity-60"></div>

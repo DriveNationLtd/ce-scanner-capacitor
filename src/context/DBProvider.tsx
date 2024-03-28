@@ -1,6 +1,28 @@
 
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
-import { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { JSX as LocalJSX, applyPolyfills } from "jeep-sqlite/loader";
+import { HTMLAttributes } from 'react';
+import { JeepSqlite } from 'jeep-sqlite/dist/components/jeep-sqlite'
+import { defineCustomElements as jeepSqlite } from "jeep-sqlite/loader";
+
+type StencilToReact<T> = {
+    [P in keyof T]?: T[P] & Omit<HTMLAttributes<Element>, 'className'> & {
+        class?: string;
+    };
+};
+
+declare global {
+    export namespace JSX {
+        interface IntrinsicElements extends StencilToReact<LocalJSX.IntrinsicElements> {
+        }
+    }
+}
+
+applyPolyfills().then(() => {
+    jeepSqlite(window);
+});
 
 const DB_NAME = 'test';
 export const EVENT_TABLE = 'cc_events';
@@ -14,9 +36,9 @@ export const eventTableQuery = `CREATE TABLE IF NOT EXISTS ${EVENT_TABLE} (
     image TEXT,
     total_orders INTEGER,
     scanned_orders INTEGER,
-    error TEXT
+    orders_error TEXT
 );`;
-export const eventTableClearQuery = `DELETE FROM ${EVENT_TABLE};`;
+export const eventTableClearQuery = `DELETE FROM ${EVENT_TABLE}; DROP TABLE ${EVENT_TABLE};`;
 
 interface DatabaseContextType {
     db: SQLiteDBConnection | null;
@@ -35,27 +57,45 @@ export const useDB = (): DatabaseContextType => {
 export const DBProvider = ({ children }: { children: React.ReactNode }) => {
     const [db, setDb] = useState<SQLiteDBConnection | null>(null);
 
+
     useEffect(() => {
+        const mSQLite = new SQLiteConnection(CapacitorSQLite);
+        const platform = Capacitor.getPlatform();
+
         const initDB = async () => {
             if (db) {
                 console.log('$$$ DB already initialized', JSON.stringify(db));
                 return;
             }
 
-            const consistency = await CapacitorSQLite.checkConnectionsConsistency({
-                dbNames: [DB_NAME],
-                openModes: ['no-encryption'],
-            });
-
-            console.log('$$$ DB Connection consistency', JSON.stringify(consistency.result));
-            const mSQLite = new SQLiteConnection(CapacitorSQLite);
-
             try {
+                if (platform === "web") {
+                    // add 'jeep-sqlite' Stencil component to the DOM
+                    const jeepEl = document.createElement("jeep-sqlite");
+                    document.body.appendChild(jeepEl);
+
+                    if (!customElements.get('jeep-sqlite')) {
+                        customElements.define('jeep-sqlite', JeepSqlite);
+                    } else {
+                        console.log('$$$ jeep-sqlite-v1 already defined');
+                    }
+
+                    // initialize the web store
+                    await mSQLite.initWebStore();
+                }
+
+                const consistency = await CapacitorSQLite.checkConnectionsConsistency({
+                    dbNames: [DB_NAME],
+                    openModes: ['no-encryption'],
+                });
+
+                console.log('$$$ DB Connection consistency', JSON.stringify(consistency.result));
+
                 const connection = await mSQLite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
                 await connection.open();
-
+                // await connection.execute(eventTableClearQuery);
                 await connection.execute(eventTableQuery);
-                // await connection.execute(eventTableQuery);
+
                 setDb(connection);
             } catch (err) {
                 console.error('Error initializing database:', err, mSQLite, db);
@@ -71,9 +111,10 @@ export const DBProvider = ({ children }: { children: React.ReactNode }) => {
         return () => {
             if (db) {
                 db.close(); // Close the connection when the component unmounts
+                mSQLite.closeConnection(DB_NAME, false);
             }
         };
-    }, [db]);
+    }, []);
 
     return (
         <DBContext.Provider value={{ db }}>

@@ -95,6 +95,9 @@ export interface Event {
         scanned: number;
         error?: string;
     }
+    total_orders: number;
+    scanned_orders: number;
+    orders_error?: string;
 }
 
 export interface EventsResponse {

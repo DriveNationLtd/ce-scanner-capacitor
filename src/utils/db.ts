@@ -8,11 +8,13 @@ import { getEvents } from '../actions/VerifyScan';
 export const syncEvents = async (db: SQLiteDBConnection, data: EventsResponse) => {
     try {
         // Loop through the events and insert them into the database
+        await db.beginTransaction();
         if (data && data.events) {
             data.events.forEach(async (event: Event) => {
-                insertEvent(event, db);
+                await insertEvent(event, db);
             })
         }
+        await db.commitTransaction();
     } catch (err) {
         console.log(`$$$ in syncEvents error ${err} $$$`);
         return null;
@@ -21,7 +23,7 @@ export const syncEvents = async (db: SQLiteDBConnection, data: EventsResponse) =
 
 // Function to insert event into database
 export const insertEvent = async (event: Event, db: SQLiteDBConnection) => {
-    const query = `INSERT INTO ${EVENT_TABLE} (id, ticket_type, title, start_date, end_date, status, image, total_orders, scanned_orders, error)
+    const query = `INSERT INTO ${EVENT_TABLE} (id, ticket_type, title, start_date, end_date, status, image, total_orders, scanned_orders, orders_error)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
@@ -52,7 +54,7 @@ export const getAllEvents = async (db: SQLiteDBConnection): Promise<Event[] | []
 
     try {
         const result = await db?.query(query);
-        if (!result.values) {
+        if (!result.values || result.values.length === 0) {
             const data = await getEvents();
             if (data.success) {
                 await syncEvents(db, data);
