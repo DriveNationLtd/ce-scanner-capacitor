@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 // import { ConnectivityStatus } from "@/shared/ConnectivityStatus";
 import { ConnectivityStatus } from './Connectivity';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { ReSync } from './ReSync';
 
 const navLinks = [
     { href: '/', label: 'Home' },
@@ -66,7 +67,7 @@ export const Header: React.FC = () => {
 
             </div>
 
-            <div className={`absolute top-16 left-0 bg-theme-dark w-full h-[calc(100vh-4rem)] p-4 z-40 transition-all duration-300 ${isMenuOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-[100%] pointer-events-none'}`}>
+            <div className={`fixed top-16 left-0 bg-theme-dark w-full h-[calc(100vh-4rem)] p-4 z-40 transition-all duration-300 ${isMenuOpen ? 'translate-x-0 pointer-events-auto' : '-translate-x-[100%] pointer-events-none'}`}>
                 <ul className="flex flex-col h-full justify-between">
                     <div className="top-nav flex flex-col gap-4">
                         {navLinks.map((link, index) => (
@@ -76,7 +77,7 @@ export const Header: React.FC = () => {
                                 </Link>
                             </li>
                         ))}
-                        {/* <ReSync callback={() => closeMenu()} /> */}
+                        <ReSync callback={() => closeMenu()} />
                     </div>
 
                     <div className="bottom-nav">

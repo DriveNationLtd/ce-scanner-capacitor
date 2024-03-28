@@ -6,6 +6,7 @@ import { JSX as LocalJSX, applyPolyfills } from "jeep-sqlite/loader";
 import { HTMLAttributes } from 'react';
 import { JeepSqlite } from 'jeep-sqlite/dist/components/jeep-sqlite'
 import { defineCustomElements as jeepSqlite } from "jeep-sqlite/loader";
+import { CREATE_EVENTS_TABLE, CREATE_TICKETS_TABLE, DB_NAME, RESET_EVENTS_TABLE, RESET_TICKETS_TABLE } from '../types/db.constants';
 
 type StencilToReact<T> = {
     [P in keyof T]?: T[P] & Omit<HTMLAttributes<Element>, 'className'> & {
@@ -24,22 +25,6 @@ applyPolyfills().then(() => {
     jeepSqlite(window);
 });
 
-const DB_NAME = 'test';
-export const EVENT_TABLE = 'cc_events';
-export const eventTableQuery = `CREATE TABLE IF NOT EXISTS ${EVENT_TABLE} (
-    id TEXT PRIMARY KEY,
-    ticket_type TEXT,
-    title TEXT,
-    start_date TEXT,
-    end_date TEXT,
-    status TEXT,
-    image TEXT,
-    total_orders INTEGER,
-    scanned_orders INTEGER,
-    orders_error TEXT
-);`;
-export const eventTableClearQuery = `DELETE FROM ${EVENT_TABLE}; DROP TABLE ${EVENT_TABLE};`;
-
 interface DatabaseContextType {
     db: SQLiteDBConnection | null;
 }
@@ -56,7 +41,6 @@ export const useDB = (): DatabaseContextType => {
 
 export const DBProvider = ({ children }: { children: React.ReactNode }) => {
     const [db, setDb] = useState<SQLiteDBConnection | null>(null);
-
 
     useEffect(() => {
         const mSQLite = new SQLiteConnection(CapacitorSQLite);
@@ -93,9 +77,14 @@ export const DBProvider = ({ children }: { children: React.ReactNode }) => {
 
                 const connection = await mSQLite.createConnection(DB_NAME, false, 'no-encryption', 1, false);
                 await connection.open();
-                // await connection.execute(eventTableClearQuery);
-                await connection.execute(eventTableQuery);
 
+                // drop tables if they exist
+                // await connection.execute(RESET_TICKETS_TABLE);
+                // await connection.execute(RESET_EVENTS_TABLE);
+
+                // create tables 
+                await connection.execute(CREATE_EVENTS_TABLE);
+                await connection.execute(CREATE_TICKETS_TABLE);
                 setDb(connection);
             } catch (err) {
                 console.error('Error initializing database:', err, mSQLite, db);

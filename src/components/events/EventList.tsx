@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDB } from '../../context/DBProvider';
 import { getAllEvents } from '../../utils/db';
 import { Event, EventsResponse } from '../../types/event';
-import Loader from "../../shared/Loader";
 import { EventTile, EventTileSkeleton, NoEventsPlaceholder } from "./EventTile";
-import { Suspense } from "react";
 
 export const EventsAysnc: React.FC = () => {
     const { db } = useDB();

@@ -1,24 +1,80 @@
+import { Link } from 'react-router-dom';
 import { Event } from '../../types/event';
 import { formatDate } from '../../utils/date';
-import { Link } from '../Link';
+import { Button } from '../../shared/Button';
+import { useEffect, useState } from 'react';
+import { getEventTickets } from '../../actions/VerifyScan';
+import { useConnectiviy } from '../../hooks/useConnectivity';
+import { checkIfEventTicketsSynced, syncEventTickets } from '../../utils/db';
+import { useDB } from '../../context/DBProvider';
 
 interface EventTileProps {
     event: Event;
 }
 
 export const EventTile: React.FC<EventTileProps> = ({ event }) => {
+    const { isOnline } = useConnectiviy();
+    const { db } = useDB();
+
     const { title, start_date, image, total_orders, scanned_orders, orders_error } = event;
+    const [loading, setLoading] = useState(false);
     const formattedDate = formatDate(start_date);
 
+    const [ticketsSynced, setTicketsSynced] = useState(false);
+    useEffect(() => {
+        if (db) {
+            checkIfEventTicketsSynced(event.id, db)
+                .then((synced) => {
+                    console.log('Tickets synced', synced);
+                    setTicketsSynced(synced);
+                });
+        }
+    }, []);
+
+    const handleSync = async () => {
+        if (!isOnline) return alert('You are offline, please connect to the internet to sync');
+        if (!db) return alert('Database not available');
+
+        console.log('Syncing event', event.id);
+        setLoading(true);
+
+        const data = await getEventTickets(event.id);
+
+        if (data.success && data.tickets) {
+            const { tickets } = data;
+            if (tickets.length === 0) {
+                alert('No tickets found for this event');
+                return;
+            }
+
+            await syncEventTickets(event.id, tickets, db);
+            setTicketsSynced(true);
+        } else {
+            console.error('Error syncing event', event.id, data.error);
+            alert(data.error);
+        }
+
+        setLoading(false);
+    }
+
+    const syncBtnText = () => {
+        if (loading) return 'Syncing...';
+        if (ticketsSynced) return 'Resync';
+        return 'Sync Tickets';
+    }
+
     return (
-        <Link href={`/events/${event.id}`}>
-            <div className="relative flex items-center gap-3 p-4 w-full rounded-md mb-2 bg-theme-dark border-none bg-opacity-90 overflow-hidden cursor-pointer">
+        <div className="relative flex items-center gap-3 p-4 w-full rounded-md mb-2 bg-theme-dark border-none bg-opacity-90 overflow-hidden cursor-pointer">
+            <Link to={`/events/${event.id}`}>
                 <div className="w-1/4 mr-4">
-                    <div className="relative w-full h-0 min-w-[100px] max-w-[100px] lg:max-w-none" style={{ paddingBottom: '100%' }}>
+                    <div className="relative w-full min-w-[100px] max-w-[100px] lg:max-w-none h-full">
                         <img src={image} alt={title} className="" />
                     </div>
                 </div>
-                <div className="flex flex-col justify-between flex-grow mt-2">
+            </Link>
+
+            <div className="flex flex-col justify-between flex-grow mt-2">
+                <Link to={`/events/${event.id}`}>
                     <div className='flex items-start justify-start flex-col'>
                         <h2 className="font-bold mb-2 text-md text-white">{title}</h2>
                         <p className="text-gray-300 text-xs">{formattedDate}</p>
@@ -32,13 +88,18 @@ export const EventTile: React.FC<EventTileProps> = ({ event }) => {
                             <p className="text-red-500 text-xs mt-2">{orders_error}</p>
                         )}
                     </div>
-                    <div className="absolute inset-0 -z-10 bg-black opacity-60"></div>
-                    <img src={image} alt={title} className="absolute inset-0 -z-10" />
-                </div>
-                {/* right chevron */}
-                <i className="fas fa-chevron-right text-sm text-gray-300"></i>
+                </Link>
+                <div className="absolute inset-0 -z-10 bg-black opacity-60"></div>
+                <img src={image} alt={title} className="absolute inset-0 -z-10 object-cover w-full" />
+                <Button className='text-xs w-fit my-3' onClick={handleSync} loading={loading} disabled={!isOnline || (orders_error ? true : false)}>
+                    {syncBtnText()}
+                </Button>
             </div>
-        </Link>
+            {/* right chevron */}
+            <Link to={`/events/${event.id}`}>
+                <i className="fas fa-chevron-right text-sm text-gray-300"></i>
+            </Link>
+        </div>
     );
 }
 

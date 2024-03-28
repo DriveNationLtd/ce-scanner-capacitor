@@ -1,6 +1,6 @@
 // import { auth } from "@/auth";
 // import { getAllEvents } from "@/localdb/db-helpers";
-import { EventTicketProgressResponse, EventsResponse, SingleEventResponse, TicketRedeemResponse, TicketScanResponse } from "../types/event";
+import { EventTicketProgressResponse, EventTicketsResponse, EventsResponse, SingleEventResponse, TicketRedeemResponse, TicketScanResponse } from "../types/event";
 // process.env.HEADLESS_CMS_API_URL ??
 const API_URL = "https://www.carevents.com";
 
@@ -144,6 +144,32 @@ export const redeemTicket = async (ticket_id: string): Promise<TicketRedeemRespo
             body: JSON.stringify({
                 user_id: user?.id,
                 order_item_id: ticket_id,
+            }),
+        });
+
+        const data = JSON.parse(await response.json());
+        return data;
+    } catch (error: any) {
+        return {
+            success: false,
+            error: error.message ?? "Internal Server Error",
+        }
+    }
+}
+
+export const getEventTickets = async (event_id: string): Promise<EventTicketsResponse> => {
+    let url = `${API_URL}/wp-json/ticket_scanner/v1/get_event_tickets`;
+
+    try {
+        const user = await getSessionUser();
+
+        let response = await fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                event_id: event_id,
             }),
         });
 

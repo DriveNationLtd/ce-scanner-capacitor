@@ -1,23 +1,31 @@
 export interface TicketScanResponse {
     success: boolean;
-    error: string;
+    error?: string;
     data?: TicketScanData;
-    order_item_id?: string;
     ticket_scanned_at?: string;
 }
 
 export interface TicketScanData {
-    event_id: string;
     event: {
+        event_id: string;
         event_name: string;
         event_venue: string;
         event_date: string;
     };
-    ticket_id: string;
-    order_item_id: string;
-    ticket: Ticket;
-    ticket_data: Order;
+    ticket: EventTicket;
 }
+// export interface TicketScanData {
+//     event_id: string;
+//     event: {
+//         event_name: string;
+//         event_venue: string;
+//         event_date: string;
+//     };
+//     ticket_id: string;
+//     order_item_id: string;
+//     ticket: Ticket;
+//     ticket_data: Order;
+// }
 
 interface Ticket {
     ID: string;
@@ -98,6 +106,7 @@ export interface Event {
     total_orders: number;
     scanned_orders: number;
     orders_error?: string;
+    venue: string
 }
 
 export interface EventsResponse {
@@ -136,4 +145,29 @@ export interface TicketRedeemResponse {
     error?: string;
     ticket_scanned_at?: string;
     order_item_id?: string;
+}
+
+export interface EventTicketsResponse {
+    success: boolean;
+    error?: string;
+    tickets?: EventTicket[];
+}
+
+export interface EventTicket {
+    event_id?: string;
+    order_id: string;
+    order_item_id: string;
+    ticket_id: string;
+    ticket_name: string;
+    decoded_qr_code: string;
+    ticket_scanned_at: string;
+    date_created_gmt: string;
+    order_status: string;
+    billing_first_name: string;
+    billing_last_name: string;
+    car_make: string;
+    car_model: string;
+    car_reg: string;
+    concours: string;
+    ticket_price: string;
 }

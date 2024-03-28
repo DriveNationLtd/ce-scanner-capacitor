@@ -1,6 +1,6 @@
 import { CapacitorConfig } from '@capacitor/cli';
 const APP_ID = 'com.example.app';
-const APP_NAME = 'react-vite-capacitor';
+const APP_NAME = 'CE Scanner';
 
 const config: CapacitorConfig = {
   appId: APP_ID,

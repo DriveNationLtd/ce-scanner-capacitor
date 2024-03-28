@@ -1,10 +1,12 @@
 import { redeemTicket } from '../../actions/VerifyScan';
+import { useDB } from '../../context/DBProvider';
 import { ErrorMessage } from '../../shared/ErrorMessage';
 import Loader from '../../shared/Loader';
 import { SuccessMessage } from '../../shared/SuccessMessage';
 import { ThemeBtn } from '../../shared/ThemeBtn';
 import { TicketScanResponse } from '../../types/event';
 import { formatDate } from '../../utils/date';
+import { redeemTicketLocally } from '../../utils/db';
 import { capitalize, formatCarDetails } from '../../utils/string';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react'
@@ -18,6 +20,7 @@ export const ScanResult: React.FC<ScanResultProps> = ({
     result,
     callback
 }) => {
+    const {db} = useDB();
     const [redeeming, setRedeeming] = useState<{
         loading: boolean;
         success: boolean;
@@ -32,7 +35,12 @@ export const ScanResult: React.FC<ScanResultProps> = ({
         return null
     }
 
-    const handleRedeem = async (ticket_id: string) => {
+    const handleRedeem = async (order_item_id: string) => {
+        if (!db) {
+            alert('Database not available');
+            return;
+        }
+
         setRedeeming({
             loading: true,
             success: false,
@@ -40,7 +48,7 @@ export const ScanResult: React.FC<ScanResultProps> = ({
         });
 
         // Redeem ticket
-        const data = await redeemTicket(ticket_id);
+        const data = await redeemTicketLocally(db, order_item_id);
 
         if (data && data.success) {
             setRedeeming({
@@ -88,16 +96,15 @@ export const ScanResult: React.FC<ScanResultProps> = ({
                 </div>
             )
         }
+
         const { event_name, event_venue, event_date } = data.event;
-        const { meta, name, price } = data?.ticket;
-        const { ticket_date_start, ticket_date_end } = meta;
         const {
-            billing_email, billing_first_name, billing_last_name, date_created_gmt,
-            order_id, order_item_id, status, payment_method_title,
-        } = data.ticket_data;
+            billing_first_name, billing_last_name, date_created_gmt,
+            order_id, order_item_id, order_status, ticket_name, ticket_price
+        } = data.ticket;
 
         // specific to car event
-        const { car_make, car_model, car_reg, concours } = data.ticket_data
+        const { car_make, car_model, car_reg, concours } = data.ticket
 
         return (
             <div className="flex flex-col bg-white px-4 rounded-lg w-full">
@@ -133,12 +140,12 @@ export const ScanResult: React.FC<ScanResultProps> = ({
 
                     <div className="flex flex-col items-center justify-center">
                         <span className='text-slate-400 text-xs'>Ticket Name</span>
-                        <h2 className="text-black text-md font-bold text-center">{name}</h2>
+                        <h2 className="text-black text-md font-bold text-center">{ticket_name}</h2>
                     </div>
 
                     <div className="flex flex-col items-center justify-center">
                         <span className='text-slate-400 text-xs'>Ticket Price</span>
-                        <h2 className="text-black text-md font-bold text-center">£{price}</h2>
+                        <h2 className="text-black text-md font-bold text-center">£{ticket_price}</h2>
                     </div>
 
                     <div className="flex flex-col items-center justify-center">
@@ -155,8 +162,8 @@ export const ScanResult: React.FC<ScanResultProps> = ({
                         <span className='text-slate-400 text-xs'>Status</span>
                         <h2 className={clsx(
                             "text-md font-bold text-center",
-                            status === "completed" ? "text-green-500" : "text-red-500"
-                        )}>{capitalize(status)}</h2>
+                            order_status === "completed" ? "text-green-500" : "text-red-500"
+                        )}>{capitalize(order_status)}</h2>
                     </div>
 
                 </div>

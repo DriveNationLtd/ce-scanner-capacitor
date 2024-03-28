@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App'
 import './index.css'
 import { DBProvider } from './context/DBProvider'
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { SingleEvent } from './components/events/SingleEvent'
 import Layout from './Layout'
 import Login from './components/Login'
+import { EventList } from './components/events/EventList'
 
 
 const router = createBrowserRouter([
@@ -17,7 +17,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <App />,
+        element: <EventList />,
       },
       {
         path: "events/:eventId",
